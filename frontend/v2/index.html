@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SecureVote - Dashboard Admin</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../css/styles.css">
+    <style>
+        /* Styles supplémentaires pour assurer le bon fonctionnement */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 9999;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-overlay.active {
+            display: flex !important;
+        }
+
+        .modal {
+            background: white;
+            border-radius: 12px;
+            padding: 0;
+            max-width: 600px;
+            width: 90%;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        }
+
+        .modal-header {
+            padding: 20px 25px;
+            border-bottom: 1px solid #eee;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .modal-header h3 {
+            margin: 0;
+            font-size: 20px;
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            color: #999;
+            padding: 0;
+            width: 30px;
+            height: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+        }
+
+        .modal-close:hover {
+            background: #f5f5f5;
+            color: #333;
+        }
+
+        .modal-body {
+            padding: 25px;
+        }
+
+        .debug-info {
+            position: fixed;
+            bottom: 10px;
+            right: 10px;
+            background: #1e1e1e;
+            color: #00ff00;
+            padding: 10px;
+            border-radius: 5px;
+            font-family: monospace;
+            font-size: 11px;
+            max-width: 300px;
+            max-height: 200px;
+            overflow-y: auto;
+            z-index: 10000;
+            display: none;
+        }
+
+        .debug-info.active {
+            display: block;
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Login Page -->
+    <div id="login-page" class="login-page">
+        <div class="login-container">
+            <div class="login-brand">
+                <div class="login-logo">🗳️</div>
+                <h1>SecureVote</h1>
+                <p>Panel d'Administration v2</p>
+            </div>
+
+            <form id="login-form" class="login-form">
+                <h2>Connexion</h2>
+                <div class="form-group">
+                    <label for="login-email">Email</label>
+                    <input type="email" id="login-email" placeholder="admin@securevote.com" required>
+                </div>
+                <div class="form-group">
+                    <label for="login-password">Mot de passe</label>
+                    <input type="password" id="login-password" placeholder="••••••••" required>
+                </div>
+                <button type="submit" class="btn btn-primary btn-full">Se connecter</button>
+                <div id="login-error" class="alert alert-error hidden"></div>
+            </form>
+
+            <form id="otp-form" class="login-form hidden">
+                <h2>Vérification OTP</h2>
+                <p class="otp-info">Un code a été envoyé à <strong id="otp-email-display"></strong></p>
+                <div class="otp-inputs" id="otp-inputs">
+                    <input type="text" maxlength="1" class="otp-input" data-index="0" autofocus>
+                    <input type="text" maxlength="1" class="otp-input" data-index="1">
+                    <input type="text" maxlength="1" class="otp-input" data-index="2">
+                    <input type="text" maxlength="1" class="otp-input" data-index="3">
+                    <input type="text" maxlength="1" class="otp-input" data-index="4">
+                    <input type="text" maxlength="1" class="otp-input" data-index="5">
+                </div>
+                <button type="submit" class="btn btn-primary btn-full">Vérifier le code</button>
+                <button type="button" class="btn btn-ghost btn-full" id="resend-otp-btn">Renvoyer le code</button>
+                <div id="otp-error" class="alert alert-error hidden"></div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Dashboard Page -->
+    <div id="dashboard-page" class="dashboard-layout hidden">
+        <aside class="sidebar">
+            <div class="sidebar-brand">
+                <div class="sidebar-logo">🗳️</div>
+                <div>
+                    <h2>SecureVote</h2>
+                    <span>Admin v2</span>
+                </div>
+            </div>
+
+            <nav class="sidebar-nav">
+                <a href="#" class="nav-item active" data-page="dashboard">
+                    <span class="nav-icon">📊</span>
+                    <span>Tableau de bord</span>
+                </a>
+                <a href="#" class="nav-item" data-page="elections">
+                    <span class="nav-icon">🗳️</span>
+                    <span>Élections</span>
+                </a>
+                <a href="#" class="nav-item" data-page="candidates">
+                    <span class="nav-icon">👥</span>
+                    <span>Candidats</span>
+                </a>
+                <a href="#" class="nav-item" data-page="roles">
+                    <span class="nav-icon">🔑</span>
+                    <span>Gestion des Rôles</span>
+                </a>
+                <a href="#" class="nav-item" data-page="settings">
+                    <span class="nav-icon">⚙️</span>
+                    <span>Paramètres</span>
+                </a>
+            </nav>
+
+            <div class="sidebar-footer">
+                <a href="#" class="nav-item logout-btn" id="logout-btn">
+                    <span class="nav-icon">🚪</span>
+                    <span>Déconnexion</span>
+                </a>
+            </div>
+        </aside>
+
+        <main class="main-content">
+            <div id="page-content">
+                <!-- Dynamic content -->
+            </div>
+        </main>
+    </div>
+
+    <!-- Modal Overlay -->
+    <div id="modal-overlay" class="modal-overlay">
+        <div class="modal" id="modal-content">
+            <!-- Dynamic modal content -->
+        </div>
+    </div>
+
+    <!-- Toast Container -->
+    <div id="toast-container" class="toast-container"></div>
+
+    <!-- Debug Info -->
+    <div id="debug-info" class="debug-info"></div>
+
+    <!-- Scripts -->
+    <script src="../js/api.js"></script>
+    <script src="main.js"></script>
+</body>
+
+</html>

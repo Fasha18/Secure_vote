@@ -1,0 +1,77 @@
+services:
+  # L'application API + Frontend
+  - type: web
+    name: secure-vote-api
+    env: node
+    plan: free
+    buildCommand: npm install
+    startCommand: npm start
+    envVars:
+      - key: NODE_ENV
+        value: production
+
+      - key: PORT
+        value: 3000
+
+      - key: DB_SSL
+        value: "true"
+
+      # ── Base de données (récupérée automatiquement depuis la DB ci-dessous) ──
+      - key: DATABASE_URL
+        fromDatabase:
+          name: secure-vote-db
+          property: connectionString   # URL complète avec SSL — utilisée par database.js
+
+      # ── Compte admin par défaut (créé automatiquement au premier démarrage) ──
+      # IMPORTANT: Changez ces valeurs dans l'interface Render avant le déploiement !
+      - key: ADMIN_EMAIL
+        value: moussaibnseyni2001@gmail.com
+      - key: ADMIN_PASSWORD
+        sync: false   # À remplir manuellement dans Render pour la sécurité
+      - key: ADMIN_FIRSTNAME
+        value: Moussa
+      - key: ADMIN_LASTNAME
+        value: Admin
+
+      # ── Secrets JWT (générés automatiquement par Render) ──
+      - key: JWT_ACCESS_SECRET
+        generateValue: true
+      - key: JWT_REFRESH_SECRET
+        generateValue: true
+      - key: ENCRYPTION_KEY
+        generateValue: true
+
+      # ── Email SMTP (à remplir manuellement dans Render) ──
+      - key: SMTP_HOST
+        value: smtp.gmail.com
+      - key: SMTP_PORT
+        value: "587"
+      - key: SMTP_SECURE
+        value: "false"
+      - key: SMTP_USER
+        sync: false   # À remplir dans Render
+      - key: SMTP_PASS
+        sync: false   # À remplir dans Render
+
+      # ── Redis (optionnel) ──
+      - key: REDIS_HOST
+        value: localhost
+      - key: REDIS_PORT
+        value: "6379"
+
+      # ── Features ──
+      - key: ENABLE_SWAGGER
+        value: "true"
+      - key: ENABLE_2FA
+        value: "true"
+      - key: ENABLE_EMAIL_VERIFICATION
+        value: "true"
+      - key: LOG_LEVEL
+        value: info
+
+# Base de données PostgreSQL
+databases:
+  - name: secure-vote-db
+    plan: free
+    databaseName: voting_db
+    user: voting_admin

@@ -1,0 +1,49 @@
+# Dépendances
+node_modules/
+dist/
+build/
+
+# Environnement (TRÈS IMPORTANT: NE JAMAIS ENVOYER SUR GITHUB)
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# IDE/Editeurs
+.vscode/
+.idea/
+*.swp
+*.swo
+.DS_Store
+
+# Fichiers temporaires ou de test
+temp_token.txt
+access_token.txt
+otp_code.txt
+candidates_list.json
+login_response.json
+login_otp_response.json
+verify_otp_response.json
+election_response.json
+audit_users.js
+audit_users_v2.js
+list-users.js
+test-*.html
+diagnostic.html
+*.json.bak
+
+# Fichiers de diagnostic (à ne pas publier)
+diagnose.js
+check_users.js
+diagnosis_result.txt
+check_output.txt
+scripts/reset_output.txt
+scripts/verify.js
