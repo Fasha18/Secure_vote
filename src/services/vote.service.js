@@ -294,7 +294,7 @@ class VoteService {
             // 13. Queue vote aggregation (Asynchronous)
             // This offloads the heavy DB updates to a background worker
             await voteQueue.add('aggregate-vote', { electionId, candidateId }, {
-                jobId: `vote:${voteId}`, // Deduplication
+                jobId: `vote-${voteId}`, // Deduplication (no colon allowed by BullMQ)
             });
 
             // 14. Audit log (NO vote details - only confirmation)

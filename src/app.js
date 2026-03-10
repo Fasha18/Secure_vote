@@ -48,6 +48,11 @@ const corsOptions = {
         // Allow requests with no origin (mobile apps, Postman, curl)
         if (!origin) return callback(null, true);
 
+        // Allow if '*' is in allowed origins
+        if (config.cors.allowedOrigins.includes('*')) {
+            return callback(null, true);
+        }
+
         // In production, strictly use allowed origins
         if (config.isProd) {
             if (config.cors.allowedOrigins.includes(origin)) {
@@ -184,13 +189,14 @@ app.use('/api', routes);
 // ===========================================
 app.use('/dashboard', express.static(path.join(__dirname, '..', 'frontend')));
 app.use('/dashboard/v2', express.static(path.join(__dirname, '..', 'frontend', 'v2')));
+app.use('/vote', express.static(path.join(__dirname, '..', 'frontend', 'voter')));
 
 
 // ===========================================
 // ROOT
 // ===========================================
 app.get('/', (req, res) => {
-    res.redirect('/dashboard');
+    res.redirect('/vote');
 });
 
 

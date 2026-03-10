@@ -379,10 +379,10 @@ class ElectionService {
     async changeElectionStatus(electionId, newStatus, userId) {
         const validTransitions = {
             'draft': ['scheduled', 'cancelled'],
-            'scheduled': ['active', 'cancelled'],
-            'active': ['closed', 'cancelled'],
-            'closed': [],
-            'cancelled': [],
+            'scheduled': ['active', 'cancelled', 'draft'],
+            'active': ['closed', 'cancelled', 'draft'],
+            'closed': ['draft'],
+            'cancelled': ['draft'],
         };
 
         const existing = await query(`SELECT * FROM elections WHERE id = $1`, [electionId]);

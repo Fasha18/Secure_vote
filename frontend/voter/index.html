@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="description" content="SecureVote — Secure Digital Voting Platform">
+    <title>SecureVote</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/voter.css">
+</head>
+<body>
+
+    <!-- ===== GLOBAL HEADER ===== -->
+    <header class="app-header" id="app-header">
+        <div class="header-inner">
+            <div class="header-brand">
+                <svg class="header-logo-icon" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <rect width="40" height="40" rx="10" fill="white" fill-opacity="0.15"/>
+                    <path d="M12 20.5L17.5 26L28 15" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+                <span class="header-title">SecureVote</span>
+            </div>
+            <button class="lang-btn" id="lang-btn" aria-label="Change language">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10A15.3 15.3 0 0 1 12 2z"/></svg>
+                <span id="lang-label">EN</span>
+            </button>
+        </div>
+    </header>
+
+    <!-- ===== MAIN CONTAINER ===== -->
+    <main class="app-main">
+
+        <!-- ============ SCREEN 1: WELCOME ============ -->
+        <section id="screen-welcome" class="screen active">
+            <div class="screen-content welcome-content">
+                <div class="welcome-hero">
+                    <div class="welcome-icon-wrap">
+                        <svg class="welcome-icon" viewBox="0 0 80 80" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <rect width="80" height="80" rx="20" fill="url(#grad1)"/>
+                            <path d="M28 35H52V55C52 56.1046 51.1046 57 50 57H30C28.8954 57 28 56.1046 28 55V35Z" fill="white" fill-opacity="0.9"/>
+                            <path d="M24 30C24 28.8954 24.8954 28 26 28H54C55.1046 28 56 28.8954 56 30V35H24V30Z" fill="white"/>
+                            <path d="M35 43L39 47L46 38" stroke="#1a56db" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+                            <defs><linearGradient id="grad1" x1="0" y1="0" x2="80" y2="80"><stop stop-color="#1a56db"/><stop offset="1" stop-color="#3b82f6"/></linearGradient></defs>
+                        </svg>
+                    </div>
+                    <h1 class="welcome-title" data-i18n="welcome_title">Your Vote Matters</h1>
+                    <p class="welcome-subtitle" data-i18n="welcome_subtitle">Secure, simple, and transparent digital voting</p>
+                </div>
+                <button class="btn btn-primary btn-xl" id="btn-start" data-i18n="start_voting">
+                    Start Voting
+                </button>
+                <p class="welcome-footer" data-i18n="welcome_footer">Your vote is anonymous and encrypted</p>
+            </div>
+        </section>
+
+        <!-- ============ SCREEN 2: LOGIN ============ -->
+        <section id="screen-login" class="screen">
+            <div class="screen-content">
+                <button class="back-btn" id="btn-back-login" aria-label="Go back">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+                </button>
+                <div class="screen-header">
+                    <div class="screen-icon">
+                        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                    </div>
+                    <h2 class="screen-title" data-i18n="login_title">Sign In</h2>
+                    <p class="screen-desc" data-i18n="login_desc">Enter your credentials to vote</p>
+                </div>
+
+                <form id="login-form" class="form" autocomplete="off">
+                    <div class="form-group">
+                        <label for="voter-email" data-i18n="email_label">Email</label>
+                        <input type="email" id="voter-email" placeholder="name@example.com" required autocomplete="email">
+                    </div>
+                    <div class="form-group">
+                        <label for="voter-password" data-i18n="password_label">Password</label>
+                        <input type="password" id="voter-password" placeholder="••••••••" required autocomplete="current-password">
+                    </div>
+                    <div id="login-error" class="alert alert-error hidden"></div>
+                    <button type="submit" class="btn btn-primary btn-lg btn-full" id="btn-login">
+                        <span data-i18n="sign_in">Sign In</span>
+                        <div class="btn-spinner hidden" id="login-spinner"></div>
+                    </button>
+                </form>
+
+                <div class="form-toggle">
+                    <span data-i18n="no_account">No account?</span>
+                    <button class="link-btn" id="btn-show-register" data-i18n="register_link">Register</button>
+                </div>
+            </div>
+        </section>
+
+        <!-- ============ SCREEN 2b: REGISTER ============ -->
+        <section id="screen-register" class="screen">
+            <div class="screen-content">
+                <button class="back-btn" id="btn-back-register" aria-label="Go back">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+                </button>
+                <div class="screen-header">
+                    <div class="screen-icon">
+                        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="8.5" cy="7" r="4"/><line x1="20" y1="8" x2="20" y2="14"/><line x1="23" y1="11" x2="17" y2="11"/></svg>
+                    </div>
+                    <h2 class="screen-title" data-i18n="register_title">Create Account</h2>
+                    <p class="screen-desc" data-i18n="register_desc">Register to participate in elections</p>
+                </div>
+
+                <form id="register-form" class="form" autocomplete="off">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="reg-firstname" data-i18n="firstname_label">First Name</label>
+                            <input type="text" id="reg-firstname" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="reg-lastname" data-i18n="lastname_label">Last Name</label>
+                            <input type="text" id="reg-lastname" required>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="reg-email" data-i18n="email_label">Email</label>
+                        <input type="email" id="reg-email" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="reg-phone" data-i18n="phone_label">Phone</label>
+                        <input type="tel" id="reg-phone" placeholder="+221 77 123 45 67" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="reg-password" data-i18n="password_label">Password</label>
+                        <input type="password" id="reg-password" placeholder="Min 8 chars" required minlength="8">
+                    </div>
+                    <div class="form-check">
+                        <input type="checkbox" id="reg-terms" required>
+                        <label for="reg-terms" data-i18n="accept_terms">I accept the terms of use</label>
+                    </div>
+                    <div id="register-error" class="alert alert-error hidden"></div>
+                    <button type="submit" class="btn btn-primary btn-lg btn-full" id="btn-register">
+                        <span data-i18n="register_btn">Create Account</span>
+                        <div class="btn-spinner hidden" id="register-spinner"></div>
+                    </button>
+                </form>
+
+                <div class="form-toggle">
+                    <span data-i18n="has_account">Already have an account?</span>
+                    <button class="link-btn" id="btn-show-login" data-i18n="login_link">Sign In</button>
+                </div>
+            </div>
+        </section>
+
+        <!-- ============ SCREEN 3: OTP ============ -->
+        <section id="screen-otp" class="screen">
+            <div class="screen-content">
+                <div class="screen-header">
+                    <div class="screen-icon">
+                        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+                    </div>
+                    <h2 class="screen-title" data-i18n="otp_title">Verification</h2>
+                    <p class="screen-desc" data-i18n="otp_desc">Enter the 6-digit code sent to your email</p>
+                </div>
+                <p class="otp-email" id="otp-email-display"></p>
+
+                <form id="otp-form" class="form">
+                    <div class="otp-inputs" id="otp-inputs">
+                        <input type="text" maxlength="1" class="otp-input" data-index="0" inputmode="numeric" pattern="[0-9]" autocomplete="one-time-code">
+                        <input type="text" maxlength="1" class="otp-input" data-index="1" inputmode="numeric" pattern="[0-9]">
+                        <input type="text" maxlength="1" class="otp-input" data-index="2" inputmode="numeric" pattern="[0-9]">
+                        <input type="text" maxlength="1" class="otp-input" data-index="3" inputmode="numeric" pattern="[0-9]">
+                        <input type="text" maxlength="1" class="otp-input" data-index="4" inputmode="numeric" pattern="[0-9]">
+                        <input type="text" maxlength="1" class="otp-input" data-index="5" inputmode="numeric" pattern="[0-9]">
+                    </div>
+                    <div id="otp-error" class="alert alert-error hidden"></div>
+                    <button type="submit" class="btn btn-primary btn-lg btn-full" id="btn-verify-otp">
+                        <span data-i18n="verify_btn">Verify Code</span>
+                        <div class="btn-spinner hidden" id="otp-spinner"></div>
+                    </button>
+                </form>
+                <button class="link-btn resend-link" id="btn-resend-otp" data-i18n="resend_otp">Resend code</button>
+            </div>
+        </section>
+
+        <!-- ============ SCREEN 4: ELECTIONS ============ -->
+        <section id="screen-elections" class="screen">
+            <div class="screen-content">
+                <div class="screen-header">
+                    <div class="screen-icon">
+                        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+                    </div>
+                    <h2 class="screen-title" data-i18n="elections_title">Choose an Election</h2>
+                    <p class="screen-desc" data-i18n="elections_desc">Select the election you want to vote in</p>
+                </div>
+
+                <div id="elections-list" class="elections-list">
+                    <!-- Dynamic election cards -->
+                </div>
+                <div id="elections-empty" class="empty-state hidden">
+                    <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" opacity="0.3"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+                    <p data-i18n="no_elections">No active elections at the moment</p>
+                </div>
+                <div id="elections-loading" class="loading-state">
+                    <div class="loader"></div>
+                    <p data-i18n="loading">Loading...</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- ============ SCREEN 5: CANDIDATES ============ -->
+        <section id="screen-candidates" class="screen">
+            <div class="screen-content">
+                <button class="back-btn" id="btn-back-candidates" aria-label="Go back">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+                </button>
+                <div class="screen-header">
+                    <h2 class="screen-title" id="candidates-election-title"></h2>
+                    <p class="screen-desc" data-i18n="candidates_desc">Tap a candidate to select</p>
+                </div>
+
+                <div id="candidates-list" class="candidates-list">
+                    <!-- Dynamic candidate cards -->
+                </div>
+                <div id="candidates-loading" class="loading-state">
+                    <div class="loader"></div>
+                    <p data-i18n="loading">Loading...</p>
+                </div>
+
+                <div class="sticky-bottom" id="candidates-bottom">
+                    <button class="btn btn-primary btn-lg btn-full" id="btn-continue-vote" disabled data-i18n="continue_btn">
+                        Continue
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- ============ SCREEN 6: CONFIRMATION ============ -->
+        <section id="screen-confirm" class="screen">
+            <div class="screen-content">
+                <button class="back-btn" id="btn-back-confirm" aria-label="Go back">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+                </button>
+                <div class="screen-header">
+                    <div class="screen-icon confirm-icon">
+                        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+                    </div>
+                    <h2 class="screen-title" data-i18n="confirm_title">Confirm Your Vote</h2>
+                    <p class="screen-desc" data-i18n="confirm_desc">Please review your selection</p>
+                </div>
+
+                <div class="confirm-card" id="confirm-card">
+                    <div class="confirm-avatar" id="confirm-avatar"></div>
+                    <h3 class="confirm-name" id="confirm-name"></h3>
+                    <p class="confirm-party" id="confirm-party"></p>
+                    <p class="confirm-election" id="confirm-election"></p>
+                </div>
+
+                <div class="confirm-warning">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+                    <span data-i18n="confirm_warning">This action cannot be undone</span>
+                </div>
+
+                <button class="btn btn-confirm btn-lg btn-full" id="btn-confirm-vote">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>
+                    <span data-i18n="confirm_vote_btn">Confirm Vote</span>
+                    <div class="btn-spinner hidden" id="confirm-spinner"></div>
+                </button>
+            </div>
+        </section>
+
+        <!-- ============ SCREEN 7: SUCCESS ============ -->
+        <section id="screen-success" class="screen">
+            <div class="screen-content success-content">
+                <div class="success-animation">
+                    <div class="success-circle">
+                        <svg class="success-check" viewBox="0 0 52 52">
+                            <circle class="success-circle-bg" cx="26" cy="26" r="25" fill="none"/>
+                            <path class="success-check-path" fill="none" d="M14.1 27.2l7.1 7.2 16.7-16.8"/>
+                        </svg>
+                    </div>
+                </div>
+                <h2 class="success-title" data-i18n="success_title">Vote Recorded!</h2>
+                <p class="success-desc" data-i18n="success_desc">Your vote has been securely recorded</p>
+
+                <div class="receipt-card" id="receipt-card">
+                    <div class="receipt-label" data-i18n="receipt_label">Receipt Code</div>
+                    <div class="receipt-code" id="receipt-code"></div>
+                    <p class="receipt-hint" data-i18n="receipt_hint">Save this code to verify your vote later</p>
+                </div>
+
+                <button class="btn btn-primary btn-lg btn-full" id="btn-done" data-i18n="done_btn">
+                    Done
+                </button>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- ===== TOAST ===== -->
+    <div id="toast-container" class="toast-container"></div>
+
+    <script src="js/voter-api.js"></script>
+    <script src="js/voter-app.js"></script>
+</body>
+</html>

@@ -14,7 +14,7 @@ const config = {
     jwt: {
         accessSecret: process.env.JWT_ACCESS_SECRET,
         refreshSecret: process.env.JWT_REFRESH_SECRET,
-        accessExpiresIn: '15m',
+        accessExpiresIn: '24h',
         refreshExpiresIn: '7d',
         issuer: 'voting-app',
         audience: 'voting-app-users',

@@ -166,7 +166,7 @@ async function startServer() {
     }
 
     // 5. Start HTTP server
-    const server = app.listen(config.port, () => {
+    const server = app.listen(config.port, '0.0.0.0', () => {
         logger.info('=================================================');
         logger.info(`🚀 Server running on port ${config.port}`);
         if (!config.isProd) {

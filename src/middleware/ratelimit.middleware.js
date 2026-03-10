@@ -66,10 +66,10 @@ const voteLimiter = createRateLimiter({
     message: 'Trop de tentatives de vote, veuillez patienter',
 });
 
-// Registration rate limiter (10 per hour)
+// Registration rate limiter (100 per hour — relaxed for development)
 const registerLimiter = createRateLimiter({
     windowMs: 60 * 60 * 1000,
-    max: 10,
+    max: 100,
     message: 'Trop de tentatives d\'inscription, veuillez réessayer plus tard',
 });
 
