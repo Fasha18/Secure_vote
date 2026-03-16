@@ -54,23 +54,72 @@ class VoteService {
             throw new UnprocessableError('Cette élection est terminée');
         }
 
-        // 3. Verify identity requirements
-        if (election.requires_national_id && !identityData.nationalId) {
-            throw new ValidationError('Un numéro d\'identité nationale est requis pour cette élection');
-        }
-        if (election.requires_student_card && !identityData.studentCard) {
-            throw new ValidationError('Un numéro de carte étudiant est requis pour cette élection');
+        // 3. Verify identity and eligibility requirements
+        const eligibilityResult = await query(
+            `SELECT u.nationality, u.student_id, u.employee_id, u.is_active_member, p.date_of_birth, u.national_id_hash
+             FROM users u
+             LEFT JOIN user_profiles p ON p.user_id = u.id
+             WHERE u.id = $1`,
+            [userId]
+        );
+
+        if (eligibilityResult.rows.length === 0) {
+            throw new NotFoundError('Utilisateur non trouvé');
         }
 
-        // 4. Verify national ID if required
-        if (election.requires_national_id && identityData.nationalId) {
+        const user = eligibilityResult.rows[0];
+
+        // 3.1 National Identity Check (Existing logic enhanced)
+        if (election.requires_national_id) {
+            if (!identityData.nationalId) {
+                throw new ValidationError('Un numéro d\'identité nationale est requis pour cette élection');
+            }
             const nationalIdHash = encryptionService.hash(identityData.nationalId);
-            const userResult = await query(
-                `SELECT national_id_hash FROM users WHERE id = $1`,
-                [userId]
-            );
-            if (userResult.rows.length > 0 && userResult.rows[0].national_id_hash !== nationalIdHash) {
+            if (user.national_id_hash && user.national_id_hash !== nationalIdHash) {
                 throw new ForbiddenError('Le numéro d\'identité ne correspond pas à votre compte');
+            }
+        }
+
+        // 3.2 National Election specific rules (Age + Nationality)
+        if (['presidential', 'legislative', 'local', 'referendum'].includes(election.type)) {
+            // Check Nationality (Demo: requiring a value)
+            if (!user.nationality) {
+                throw new ForbiddenError('Éligibilité refusée : Information sur la nationalité manquante');
+            }
+            
+            // Check Age (>= 18)
+            if (user.date_of_birth) {
+                const birthDate = new Date(user.date_of_birth);
+                let age = now.getFullYear() - birthDate.getFullYear();
+                const m = now.getMonth() - birthDate.getMonth();
+                if (m < 0 || (m === 0 && now.getDate() < birthDate.getDate())) {
+                    age--;
+                }
+                if (age < 18) {
+                    throw new ForbiddenError(`Éligibilité refusée : Vous n'avez pas l'âge légal pour voter (${age} ans)`);
+                }
+            } else {
+                throw new ForbiddenError('Éligibilité refusée : Date de naissance manquante pour vérification de l\'âge');
+            }
+        }
+
+        // 3.3 University Election specific rules
+        if (election.type === 'university' || election.requires_student_card) {
+            if (!user.student_id) {
+                throw new ForbiddenError('Éligibilité refusée : Pas de numéro étudiant valide trouvé');
+            }
+            if (!user.is_active_member) {
+                throw new ForbiddenError('Éligibilité refusée : Votre statut étudiant n\'est pas actif');
+            }
+        }
+
+        // 3.4 Corporate Election specific rules
+        if (election.type === 'corporate') {
+            if (!user.employee_id) {
+                throw new ForbiddenError('Éligibilité refusée : Aucun matricule employé trouvé');
+            }
+            if (!user.is_active_member) {
+                throw new ForbiddenError('Éligibilité refusée : Votre statut employé n\'est pas actif');
             }
         }
 

@@ -68,9 +68,11 @@ class AuthService {
             logger.info('📝 Attempting to insert user into DB', { email: userData.email.toLowerCase() });
 
             const result = await client.query(
-                `INSERT INTO users (email, phone, password_hash, first_name, last_name, national_id_hash, student_card_hash, role)
-         VALUES ($1, $2, $3, $4, $5, $6, $7, 'voter')
-         RETURNING id, email, phone, first_name, last_name, role, created_at`,
+                `INSERT INTO users (email, phone, password_hash, first_name, last_name, national_id_hash, student_card_hash, role,
+                                   nationality, student_id, employee_id, organization_name)
+         VALUES ($1, $2, $3, $4, $5, $6, $7, 'voter', $8, $9, $10, $11)
+         RETURNING id, email, phone, first_name, last_name, role, created_at,
+                   nationality, student_id, employee_id, organization_name`,
                 [
                     userData.email.toLowerCase(),
                     userData.phone,
@@ -79,6 +81,10 @@ class AuthService {
                     userData.lastName,
                     nationalIdHash,
                     studentCardHash,
+                    userData.nationality || null,
+                    userData.studentId || null,
+                    userData.employeeId || null,
+                    userData.organizationName || null,
                 ]
             );
 
@@ -529,6 +535,7 @@ class AuthService {
         const result = await query(
             `SELECT u.id, u.email, u.phone, u.first_name, u.last_name, u.role,
               u.email_verified, u.phone_verified, u.created_at, u.last_login_at,
+              u.nationality, u.student_id, u.employee_id, u.organization_name, u.is_active_member,
               p.avatar_url, p.bio, p.date_of_birth, p.gender, p.city, p.country,
               p.language_preference, p.notification_preferences,
               COALESCE(t.enabled, FALSE) as two_factor_enabled
@@ -555,6 +562,11 @@ class AuthService {
             emailVerified: user.email_verified,
             phoneVerified: user.phone_verified,
             twoFactorEnabled: user.two_factor_enabled,
+            nationality: user.nationality,
+            studentId: user.student_id,
+            employeeId: user.employee_id,
+            organizationName: user.organization_name,
+            isActiveMember: user.is_active_member,
             profile: {
                 avatarUrl: user.avatar_url,
                 bio: user.bio,
@@ -570,38 +582,79 @@ class AuthService {
         };
     }
 
-    /**
-     * Update user profile
-     */
     async updateProfile(userId, profileData) {
         if (!profileData) {
             throw new ValidationError('Données de profil manquantes');
         }
-        const allowedFields = ['bio', 'date_of_birth', 'gender', 'city', 'country', 'language_preference'];
-        const updates = [];
-        const values = [];
-        let paramIndex = 1;
 
-        for (const field of allowedFields) {
-            const camelCase = field.replace(/_([a-z])/g, (_, letter) => letter.toUpperCase());
-            if (profileData[camelCase] !== undefined) {
-                updates.push(`${field} = $${paramIndex}`);
-                values.push(profileData[camelCase]);
-                paramIndex++;
+        const client = await getClient();
+        try {
+            await client.query('BEGIN');
+
+            const usersFields = [
+                'firstName', 'lastName', 'phone', 'nationality',
+                'studentId', 'employeeId', 'organizationName'
+            ];
+            const profilesFields = [
+                'bio', 'dateOfBirth', 'gender', 'city', 'country', 'languagePreference'
+            ];
+
+            // 1. Update users table
+            const userUpdates = [];
+            const userValues = [];
+            let uIdx = 1;
+
+            for (const field of usersFields) {
+                if (profileData[field] !== undefined) {
+                    const snakeCase = field.replace(/[A-Z]/g, letter => `_${letter.toLowerCase()}`);
+                    userUpdates.push(`${snakeCase} = $${uIdx}`);
+                    userValues.push(profileData[field]);
+                    uIdx++;
+                }
             }
+
+            if (userUpdates.length > 0) {
+                userValues.push(userId);
+                await client.query(
+                    `UPDATE users SET ${userUpdates.join(', ')}, updated_at = NOW() WHERE id = $${uIdx}`,
+                    userValues
+                );
+            }
+
+            // 2. Update user_profiles table
+            const profileUpdates = [];
+            const profileValues = [];
+            let pIdx = 1;
+
+            for (const field of profilesFields) {
+                if (profileData[field] !== undefined) {
+                    const snakeCase = field.replace(/[A-Z]/g, letter => `_${letter.toLowerCase()}`);
+                    profileUpdates.push(`${snakeCase} = $${pIdx}`);
+                    profileValues.push(profileData[field]);
+                    pIdx++;
+                }
+            }
+
+            if (profileUpdates.length > 0) {
+                profileValues.push(userId);
+                await client.query(
+                    `UPDATE user_profiles SET ${profileUpdates.join(', ')}, updated_at = NOW() WHERE user_id = $${pIdx}`,
+                    profileValues
+                );
+            }
+
+            if (userUpdates.length === 0 && profileUpdates.length === 0) {
+                throw new ValidationError('Aucun champ à mettre à jour');
+            }
+
+            await client.query('COMMIT');
+            return this.getProfile(userId);
+        } catch (error) {
+            await client.query('ROLLBACK');
+            throw error;
+        } finally {
+            client.release();
         }
-
-        if (updates.length === 0) {
-            throw new ValidationError('Aucun champ à mettre à jour');
-        }
-
-        values.push(userId);
-        await query(
-            `UPDATE user_profiles SET ${updates.join(', ')}, updated_at = NOW() WHERE user_id = $${paramIndex}`,
-            values
-        );
-
-        return this.getProfile(userId);
     }
 }
 

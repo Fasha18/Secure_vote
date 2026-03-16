@@ -50,7 +50,8 @@ class UserService {
 
         const result = await query(
             `SELECT u.id, u.email, u.first_name, u.last_name, u.phone, u.role,
-                    u.is_active, u.email_verified, u.created_at, u.last_login_at
+                    u.is_active, u.email_verified, u.created_at, u.last_login_at,
+                    u.nationality, u.student_id, u.employee_id, u.organization_name, u.is_active_member
              FROM users u
              WHERE ${whereClause}
              ORDER BY u.created_at DESC
@@ -69,6 +70,11 @@ class UserService {
             emailVerified: u.email_verified,
             createdAt: u.created_at,
             lastLoginAt: u.last_login_at,
+            nationality: u.nationality,
+            studentId: u.student_id,
+            employeeId: u.employee_id,
+            organizationName: u.organization_name,
+            isActiveMember: u.is_active_member,
         }));
 
         return {
@@ -83,7 +89,8 @@ class UserService {
     async getUserById(userId) {
         const result = await query(
             `SELECT id, email, first_name, last_name, phone, role, is_active,
-                    email_verified, created_at, last_login_at
+                    email_verified, created_at, last_login_at,
+                    nationality, student_id, employee_id, organization_name, is_active_member
              FROM users WHERE id = $1`,
             [userId]
         );
@@ -104,6 +111,11 @@ class UserService {
             emailVerified: u.email_verified,
             createdAt: u.created_at,
             lastLoginAt: u.last_login_at,
+            nationality: u.nationality,
+            studentId: u.student_id,
+            employeeId: u.employee_id,
+            organizationName: u.organization_name,
+            isActiveMember: u.is_active_member,
         };
     }
 

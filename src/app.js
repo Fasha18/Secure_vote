@@ -93,7 +93,7 @@ app.use(express.json({ limit: '5mb' })); // Reduced limit for production
 app.use(express.urlencoded({ extended: true, limit: '5mb' }));
 
 // Compression
-app.use(compression());
+// app.use(compression());
 
 // ===========================================
 // LOGGING
